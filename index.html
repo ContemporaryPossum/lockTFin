@@ -597,19 +597,19 @@
         // EXAMPLE (YouTube): { type: "youtube", id: "dQw4w9WgXcQ" }
         { type: "video",
           src: "hf_20260806_071959_bd93257b-a24d-49dc-8bc9-0c53db4c5719.mp4",
-          poster: "" }
+          poster: "" },
         { type: "video",
           src: "hf_20260806_084443_1c88602a-8af0-4ed1-ab06-3950d59b65fb.mp4",
-          poster: "" }
+          poster: "" },
         { type: "video",
           src: "hf_20260806_083420_11b2ff21-e909-4ac7-a4b5-0ee13eca7080.mp4",
-          poster: "" }
+          poster: "" },
         { type: "video",
           src: "hf_20260806_082830_80c113ed-acde-4cfe-86aa-d5c934b853d0.mp4",
-          poster: "" }
+          poster: "" },
         { type: "video",
           src: "hf_20260806_081745_c50deaa2-ed43-4554-9ebb-c0311bba2cc5.mp4",
-          poster: "" }
+          poster: "" },
         { type: "video",
           src: "hf_20260806_081702_fcf9f232-cacc-4088-9720-af19fa90ca6e (1).mp4",
           poster: "" }
@@ -738,13 +738,15 @@
     const mTime = $("#mTime");
     let modalPlayer = null;   // { el, type, id }
     let modalMuted = false;
+    let modalIndex = 0;
 
     function openModal() {
       lockModal.classList.add("open");
       triggerShakeFX();
       // Build the player fresh each time so it starts from the top.
       modalStage.innerHTML = "";
-      const cfg = CONFIG.lockInVideo[0];
+      const cfg = CONFIG.lockInVideo[modalIndex % CONFIG.lockInVideo.length];
+      modalIndex++;
       modalPlayer = buildVideo(cfg, { loop: false, muted: modalMuted, controls: false });
       modalStage.appendChild(modalPlayer.el);
 
