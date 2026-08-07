@@ -397,6 +397,7 @@
     }
     .modal .close:hover { color: var(--accent); transform: rotate(90deg); }
     .modal .stage { position: relative; aspect-ratio: 16 / 9; background: #000; }
+    .modal .stage-wrap { position: relative; }
     .modal .stage video, .modal .stage iframe { width: 100%; height: 100%; object-fit: cover; display: block; border: 0; }
     /* Big center play overlay */
     .modal .bigplay {
@@ -409,6 +410,23 @@
     }
     .modal .bigplay.hidden { opacity: 0; pointer-events: none; }
     .modal .bigplay:hover { transform: scale(1.1); }
+    /* Skip arrows overlaid on the left/right edges of the video */
+    .modal .skip {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 52px; height: 64px;
+      display: grid; place-items: center;
+      background: rgba(5,6,10,0.55);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-size: 30px; line-height: 1;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      z-index: 5;
+      transition: background .2s, color .2s, border-color .2s;
+    }
+    .modal .skip:hover { background: rgba(5,6,10,0.85); color: var(--accent); border-color: var(--accent); }
+    .modal .skip-prev { left: 0; border-radius: 0 12px 12px 0; }
+    .modal .skip-next { right: 0; border-radius: 12px 0 0 12px; }
     /* Custom control bar */
     .modal .bar {
       display: flex; align-items: center; gap: 12px;
@@ -546,9 +564,15 @@
         <div class="t"><span class="hl">⚡ LOCK IN</span> — Hype Sequence</div>
         <button class="close" data-close aria-label="Close">&times;</button>
       </div>
-      <div class="stage" id="modalStage"></div>
+      <div class="stage-wrap">
+        <div class="stage" id="modalStage"></div>
+        <button class="skip skip-prev" id="skipPrev" aria-label="Previous video">‹</button>
+        <button class="skip skip-next" id="skipNext" aria-label="Next video">›</button>
+      </div>
       <div class="bar">
+        <button id="mPrev" aria-label="Previous video" title="Previous">⏮</button>
         <button class="play" id="mPlay" aria-label="Play / Pause">▶</button>
+        <button id="mNext" aria-label="Next video" title="Next">⏭</button>
         <button id="mRestart" aria-label="Restart" title="Restart">↺</button>
         <button id="mMute" aria-label="Toggle sound" title="Toggle sound">🔊</button>
         <span class="rlabel">Lock In 4K</span>
@@ -585,9 +609,6 @@
       backgroundVideos: [
         { type: "video",
           src: "hf_20260806_062852_4ee4eaf6-bff3-42dc-b672-cb43abf3cfdb.mp4",
-          poster: "" },
-        { type: "video",
-          src: "nikkijonas.mp4",
           poster: "" },
       ],
       /* Lock-in modal motivation clip. */
@@ -736,6 +757,10 @@
     const mRestart = $("#mRestart");
     const mMute = $("#mMute");
     const mTime = $("#mTime");
+    const mPrev = $("#mPrev");
+    const mNext = $("#mNext");
+    const skipPrev = $("#skipPrev");
+    const skipNext = $("#skipNext");
     let modalPlayer = null;   // { el, type, id }
     let modalMuted = false;
     let modalIndex = 0;       // which video in the lockInVideo playlist is current
@@ -800,6 +825,12 @@
     }
 
     mPlay.addEventListener("click", () => togglePlay());
+    // Skip to the previous / next video in the playlist (autoplays the new one).
+    mPrev.addEventListener("click", () => loadVideo(modalIndex - 1, true));
+    mNext.addEventListener("click", () => loadVideo(modalIndex + 1, true));
+    // Overlay arrows on the video edges do the same skip.
+    skipPrev.addEventListener("click", () => loadVideo(modalIndex - 1, true));
+    skipNext.addEventListener("click", () => loadVideo(modalIndex + 1, true));
     mRestart.addEventListener("click", () => {
       const v = modalPlayer.el;
       v.currentTime = 0;
