@@ -583,18 +583,12 @@
     const CONFIG = {
       /* Background loop — cycle through a playlist. */
       backgroundVideos: [
-        // EXAMPLE (direct mp4): uncomment and drop your own URL in.
-        // { type: "video", src: "https://example.com/hype-loop.mp4", poster: "" },
         { type: "video",
           src: "hf_20260806_062852_4ee4eaf6-bff3-42dc-b672-cb43abf3cfdb.mp4",
           poster: "" },
-        { type: "video",
-          src: "hf_20260806_062852_4ee4eaf6-bff3-42dc-b672-cb43abf3cfdb.mp4",
-          poster: "" }
       ],
       /* Lock-in modal motivation clip. */
       lockInVideo: [
-        // EXAMPLE (YouTube): { type: "youtube", id: "dQw4w9WgXcQ" }
         { type: "video",
           src: "hf_20260806_071959_bd93257b-a24d-49dc-8bc9-0c53db4c5719.mp4",
           poster: "" },
@@ -735,15 +729,13 @@
     const mTime = $("#mTime");
     let modalPlayer = null;   // { el, type, id }
     let modalMuted = false;
-    let modalIndex = 0;
 
     function openModal() {
       lockModal.classList.add("open");
       triggerShakeFX();
       // Build the player fresh each time so it starts from the top.
       modalStage.innerHTML = "";
-      const cfg = CONFIG.lockInVideo[modalIndex % CONFIG.lockInVideo.length];
-      modalIndex++;
+      const cfg = CONFIG.lockInVideo[0];
       modalPlayer = buildVideo(cfg, { loop: false, muted: modalMuted, controls: false });
       modalStage.appendChild(modalPlayer.el);
 
