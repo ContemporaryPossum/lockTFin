@@ -735,13 +735,21 @@
     const mTime = $("#mTime");
     let modalPlayer = null;   // { el, type, id }
     let modalMuted = false;
+    let modalIndex = 0;       // which video in the lockInVideo playlist is current
 
     function openModal() {
       lockModal.classList.add("open");
       triggerShakeFX();
-      // Build the player fresh each time so it starts from the top.
+      // Start from the first video, paused (user clicks the big play button).
+      loadVideo(0, false);
+    }
+
+    // Load a video from the lockInVideo playlist. Auto-advances to the next
+    // one when the current video ends (see the "ended" handler below).
+    function loadVideo(index, autoplay) {
+      modalIndex = index;
       modalStage.innerHTML = "";
-      const cfg = CONFIG.lockInVideo[0];
+      const cfg = CONFIG.lockInVideo[modalIndex % CONFIG.lockInVideo.length];
       modalPlayer = buildVideo(cfg, { loop: false, muted: modalMuted, controls: false });
       modalStage.appendChild(modalPlayer.el);
 
@@ -754,6 +762,7 @@
         modalStage.appendChild(bp);
         bindVideoControls();
         resetTime();
+        if (autoplay) togglePlay(true);   // auto-advance → play the next one immediately
       } else {
         // iframe players (youtube/vimeo) — hide custom bar, show native
         mPlay.style.display = "none";
@@ -770,7 +779,10 @@
       v.addEventListener("timeupdate", () => {
         mTime.textContent = fmt(v.currentTime) + " / " + fmt(v.duration);
       });
-      v.addEventListener("ended", () => { mPlay.textContent = "▶"; });
+      v.addEventListener("ended", () => {
+        // Auto-advance to the next video in the playlist (loops back to the start).
+        loadVideo(modalIndex + 1, true);
+      });
       v.addEventListener("play", () => { mPlay.textContent = "⏸"; });
       v.addEventListener("pause", () => { mPlay.textContent = "▶"; });
     }
